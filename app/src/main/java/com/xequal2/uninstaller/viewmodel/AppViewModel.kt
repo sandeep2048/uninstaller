@@ -13,25 +13,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
-    enum class AppCategory { USER, SYSTEM }
+import kotlinx.coroutines.launch
 
+class AppViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = AppRepository(application)
+
+    // Category support
+    enum class AppCategory { USER, SYSTEM }
     private val _category = MutableStateFlow(AppCategory.USER)
     val category: StateFlow<AppCategory> = _category.asStateFlow()
-
-        combine(_apps, _query, _category) { list, q, cat ->
-            list.filter { app ->
-                val matchesCategory = when (cat) {
-                    AppCategory.USER -> !app.isSystemApp
-                    AppCategory.SYSTEM -> app.isSystemApp
-                }
-                val matchesQuery = q.isBlank() || app.name.contains(q, ignoreCase = true)
-                matchesCategory && matchesQuery
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
     fun selectCategory(category: AppCategory) {
         _category.value = category
     }
 
+    // Main data
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
 
@@ -41,11 +36,17 @@ import kotlinx.coroutines.flow.SharingStarted
     private val _selected = MutableStateFlow<Set<String>>(emptySet())
     val selected: StateFlow<Set<String>> = _selected.asStateFlow()
 
-    // --- FIXED filteredApps implementation ---
+    // Combined filter: supports category and search query
     val filteredApps: StateFlow<List<AppInfo>> =
-        combine(_apps, _query) { apps: List<AppInfo>, q: String ->
-            if (q.isBlank()) apps
-            else apps.filter { it.name.contains(q, ignoreCase = true) }
+        combine(_apps, _query, _category) { apps, q, cat ->
+            apps.filter { app ->
+                val matchesCategory = when (cat) {
+                    AppCategory.USER -> !app.isSystemApp
+                    AppCategory.SYSTEM -> app.isSystemApp
+                }
+                val matchesQuery = q.isBlank() || app.name.contains(q, ignoreCase = true)
+                matchesCategory && matchesQuery
+            }
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
