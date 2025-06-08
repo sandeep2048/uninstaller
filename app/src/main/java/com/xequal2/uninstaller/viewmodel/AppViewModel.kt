@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
@@ -25,14 +27,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _selected = MutableStateFlow<Set<String>>(emptySet())
     val selected: StateFlow<Set<String>> = _selected.asStateFlow()
 
+    // --- FIXED filteredApps implementation ---
     val filteredApps: StateFlow<List<AppInfo>> =
-        MutableStateFlow(emptyList()).apply {
-            viewModelScope.launch {
-                combine(_apps, _query) { list, q ->
-                    if (q.isBlank()) list else list.filter { it.name.contains(q, true) }
-                }.collect { value = it }
-            }
-        }.asStateFlow()
+        combine(_apps, _query) { apps: List<AppInfo>, q: String ->
+            if (q.isBlank()) apps
+            else apps.filter { it.name.contains(q, ignoreCase = true) }
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
 
     init {
         refresh()
