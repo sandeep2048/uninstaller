@@ -31,6 +31,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refresh()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
