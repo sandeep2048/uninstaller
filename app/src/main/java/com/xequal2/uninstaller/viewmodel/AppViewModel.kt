@@ -85,7 +85,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val intent = Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg"))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
+            // remove package from list immediately for faster UI feedback
+            _apps.value = _apps.value.filter { it.packageName != pkg }
         }
         clearSelection()
+        // refresh in background to ensure list stays up to date
+        refresh()
     }
 }

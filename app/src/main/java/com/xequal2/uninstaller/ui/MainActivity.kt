@@ -4,15 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Menu
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.xequal2.uninstaller.R
 import com.xequal2.uninstaller.ui.theme.UninstallerTheme
 import com.xequal2.uninstaller.viewmodel.AppViewModel
 
@@ -26,6 +33,7 @@ class MainActivity : ComponentActivity() {
             UninstallerTheme(useDarkTheme = darkMode) {
                 MainScreen(
                     viewModel = viewModel,
+                    darkMode = darkMode,
                     onToggleTheme = { darkMode = !darkMode }
                 )
             }
@@ -42,6 +50,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(
     viewModel: AppViewModel,
+    darkMode: Boolean,
     onToggleTheme: () -> Unit
 ) {
     val apps by viewModel.filteredApps.collectAsState()
@@ -62,7 +71,17 @@ fun MainScreen(
                 title = { Text(text = "Uninstaller") },
                 actions = {
                     IconButton(onClick = onToggleTheme) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Toggle theme")
+                        if (darkMode) {
+                            Icon(
+                                painter = painterResource(R.drawable.outline_backlight_high_24),
+                                contentDescription = "Light theme"
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.outline_dark_mode_24),
+                                contentDescription = "Dark theme"
+                            )
+                        }
                     }
                 }
             )
@@ -87,12 +106,18 @@ fun MainScreen(
             SearchBar(query = query, onQueryChange = viewModel::updateQuery)
 
             // App List
-            AppList(
-                apps = apps,
-                selected = selected,
-                onAppClick = { viewModel.toggleSelection(it) },
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            if (apps.isEmpty()) {
+                Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            } else {
+                AppList(
+                    apps = apps,
+                    selected = selected,
+                    onAppClick = { viewModel.toggleSelection(it) },
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
