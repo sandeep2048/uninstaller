@@ -50,11 +50,11 @@ fun AppItem(app: AppInfo, selected: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(enabled = !app.isSystemApp) { onClick() }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Image(
                 bitmap = app.icon.toBitmap().asImageBitmap(),
@@ -66,7 +66,9 @@ fun AppItem(app: AppInfo, selected: Boolean, onClick: () -> Unit) {
                 Text(text = app.name, style = MaterialTheme.typography.bodyLarge)
                 Text(text = app.packageName, style = MaterialTheme.typography.bodySmall)
             }
-            Checkbox(checked = selected, onCheckedChange = { onClick() })
+            if (!app.isSystemApp) {
+                Checkbox(checked = selected, onCheckedChange = { onClick() })
+            }
         }
     }
 }
