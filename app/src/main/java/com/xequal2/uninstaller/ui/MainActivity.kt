@@ -4,19 +4,40 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.xequal2.uninstaller.viewmodel.AppViewModel.AppCategory
+    val category by viewModel.category.collectAsState()
+        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+            TabRow(selectedTabIndex = if (category == AppCategory.USER) 0 else 1) {
+                Tab(
+                    selected = category == AppCategory.USER,
+                    onClick = { viewModel.selectCategory(AppCategory.USER) },
+                    text = { Text("User Apps") }
+                )
+                Tab(
+                    selected = category == AppCategory.SYSTEM,
+                    onClick = { viewModel.selectCategory(AppCategory.SYSTEM) },
+                    text = { Text("System Apps") }
+                )
+            }
+                onAppClick = { viewModel.toggleSelection(it) },
+                modifier = Modifier.padding(top = 8.dp)
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api

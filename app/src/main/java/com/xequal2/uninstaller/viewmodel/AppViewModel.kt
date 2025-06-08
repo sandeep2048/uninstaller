@@ -13,10 +13,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.launch
+    enum class AppCategory { USER, SYSTEM }
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = AppRepository(application)
+    private val _category = MutableStateFlow(AppCategory.USER)
+    val category: StateFlow<AppCategory> = _category.asStateFlow()
+
+        combine(_apps, _query, _category) { list, q, cat ->
+            list.filter { app ->
+                val matchesCategory = when (cat) {
+                    AppCategory.USER -> !app.isSystemApp
+                    AppCategory.SYSTEM -> app.isSystemApp
+                }
+                val matchesQuery = q.isBlank() || app.name.contains(q, ignoreCase = true)
+                matchesCategory && matchesQuery
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    fun selectCategory(category: AppCategory) {
+        _category.value = category
+    }
 
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()

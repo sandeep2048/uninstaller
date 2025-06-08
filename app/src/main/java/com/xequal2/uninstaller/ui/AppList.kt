@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,7 +30,10 @@ fun AppList(
     onAppClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier.padding(8.dp)) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(vertical = 4.dp, horizontal = 0.dp)
+    ) {
         items(apps) { app ->
             AppItem(
                 app = app,
@@ -49,8 +53,8 @@ fun AppItem(app: AppInfo, selected: Boolean, onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
                 bitmap = app.icon.toBitmap().asImageBitmap(),
