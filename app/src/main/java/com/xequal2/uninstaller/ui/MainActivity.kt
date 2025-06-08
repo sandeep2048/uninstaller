@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Menu
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.xequal2.uninstaller.R
 import com.xequal2.uninstaller.ui.theme.UninstallerTheme
 import com.xequal2.uninstaller.viewmodel.AppViewModel
 
@@ -70,12 +73,12 @@ fun MainScreen(
                     IconButton(onClick = onToggleTheme) {
                         if (darkMode) {
                             Icon(
-                                Icons.Default.LightMode,
+                                painter = painterResource(R.drawable.outline_backlight_high_24),
                                 contentDescription = "Light theme"
                             )
                         } else {
                             Icon(
-                                Icons.Default.DarkMode,
+                                painter = painterResource(R.drawable.outline_dark_mode_24),
                                 contentDescription = "Dark theme"
                             )
                         }
